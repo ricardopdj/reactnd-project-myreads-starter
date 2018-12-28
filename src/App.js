@@ -16,17 +16,25 @@ class BooksApp extends React.Component {
         showSearchPage: false
     }
     componentDidMount() {
+        this.getBooks()
+    }
+
+    getBooks() {
         BooksAPI
             .getAll()
             .then((books) => {
-                console.log(books);
-
                 this.setState({books})
             })
     }
-    changeShelf = (book) => {
-        console.log(book);
 
+    moveBook(book, shelf) {
+        BooksAPI
+            .update(book, shelf)
+            .then((response) => {
+                book.shelf = shelf;
+                this.setState({books: this.state.books});
+                // this.getBooks()
+            });
     }
 
     render() {
@@ -64,23 +72,29 @@ class BooksApp extends React.Component {
                             </div>
                             <div className="list-books-content">
                                 <Shelf
+                                    key={1}
+                                    id="shelf-1"
                                     title="Currently Reading"
-                                    books={this
-                                    .state
-                                    .books
-                                    .filter((book) => (book.shelf === "currentlyReading"))}></Shelf>
+                                    books={this.state.books.filter((book) => (book.shelf === "currentlyReading"))}
+                                    onMoveBook={(book, shelf) => {
+                                        this.moveBook(book, shelf)
+                                    }}></Shelf>
                                 <Shelf
+                                    key={2}
+                                    id="shelf-2"
                                     title="Want to Read"
-                                    books={this
-                                    .state
-                                    .books
-                                    .filter((book) => (book.shelf === "wantToRead"))}></Shelf>
+                                    books={this.state.books.filter((book) => (book.shelf === "wantToRead"))}
+                                    onMoveBook={(book, shelf) => {
+                                        this.moveBook(book, shelf)
+                                    }}></Shelf>
                                 <Shelf
+                                    key={3}
+                                    id="shelf-3"
                                     title="Read"
-                                    books={this
-                                    .state
-                                    .books
-                                    .filter((book) => (book.shelf === "read"))}></Shelf>
+                                    books={this.state.books.filter((book) => (book.shelf === "read"))}
+                                    onMoveBook={(book, shelf) => {
+                                        this.moveBook(book, shelf)
+                                    }}></Shelf>
                             </div>
                             <div className="open-search">
                                 <button onClick={() => this.setState({showSearchPage: true})}>Add a book</button>
