@@ -1,6 +1,6 @@
 import React from 'react'
 import * as BooksAPI from './BooksAPI'
-import {BrowserRouter as Router, Route, Link} from "react-router-dom";
+import { Route } from "react-router-dom";
 import Search from './Search'
 import ListBook from './ListBook'
 import './App.css'
@@ -8,7 +8,7 @@ import './App.css'
 class BooksApp extends React.Component {
     state = {
         myBooks: [],
-        searchBooks: []
+        searchedBooks: [],
     }
     componentDidMount() {
         this.getBooks()
@@ -22,7 +22,6 @@ class BooksApp extends React.Component {
             })
     }
 
-
     moveBook = (book, shelf) => {
         BooksAPI
             .update(book, shelf)
@@ -31,11 +30,35 @@ class BooksApp extends React.Component {
             });
     }
 
+    search = (query) => {
+        if (query.length > 0) {
+            BooksAPI
+                .search(query)
+                .then((searchedBooks) => {
+                    if (searchedBooks && searchedBooks.length > 0) {
+                        searchedBooks.map(book =>
+                            (this.state.myBooks.filter((b) => b.id === book.id)
+                            .map(b => book.shelf = b.shelf))
+                        )
+                        this.setState({searchedBooks})
+                    } else {
+                        this.clearSearch()
+                    }
+                });
+        } else {
+            this.clearSearch();
+        }
+    }
+
+    clearSearch = () => {
+        this.setState({ query: '', searchedBooks: []})
+    }
+
     render() {
         return (
             <div className="app">
                 <Route exact path='/search' render={() => (
-                    <Search books={this.state.myBooks} onMoveBook={this.moveBook}/>
+                    <Search searchedBooks={this.state.searchedBooks} onMoveBook={this.moveBook} onSearch={this.search} onClearSearch={this.clearSearch}/>
                 )}/>
 
                 <Route exact path='/' render={() => (
