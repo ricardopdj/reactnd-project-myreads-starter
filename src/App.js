@@ -23,11 +23,12 @@ class BooksApp extends React.Component {
     }
 
     moveBook = (book, shelf) => {
-        BooksAPI
-            .update(book, shelf)
-            .then((response) => {
-                this.getBooks()
-            });
+        BooksAPI.update(book, shelf);
+        book.shelf = shelf;
+        this.setState({
+            myBooks: this.state.myBooks.filter(b => b.id !== book.id).concat([ book ]),
+        })
+
     }
 
     search = (query) => {
